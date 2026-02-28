@@ -9,14 +9,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files and install all dependencies (including dev for tsc)
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Copy source and build
 COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npx tsc
+
+# Remove dev dependencies after build
+RUN npm prune --omit=dev
 
 # Create directories for generated files
 RUN mkdir -p public/temp-pages public/output
