@@ -18,7 +18,7 @@ const PORT = parseInt(process.env.PORT || '4000', 10);
 
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim().replace(/\/+$/, ''))
   : ['http://localhost:3000'];
 
 app.use(
