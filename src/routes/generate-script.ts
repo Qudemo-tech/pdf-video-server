@@ -16,7 +16,9 @@ export async function generateScriptHandler(req: Request, res: Response) {
     const selectedTone = tone || 'professional';
     const selectedDuration = maxLengthSeconds || 120;
 
+    console.log('[generate-script] Request received — tone:', selectedTone, '| duration:', selectedDuration, 's | text length:', text.length);
     const result = await generateScript(text, selectedTone, selectedDuration);
+    console.log('[generate-script] Script generated — words:', result.wordCount, '| estimated duration:', result.estimatedDurationSeconds, 's');
 
     return res.json({
       success: true,

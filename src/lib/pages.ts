@@ -9,6 +9,7 @@ const TEMP_PAGES_DIR = path.join(process.cwd(), 'public', 'temp-pages');
  * Returns an array of relative URL paths like /temp-pages/page-1.jpg
  */
 export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
+  console.log('[pages] Converting PDF to images — buffer size:', pdfBuffer.length);
   // Ensure output directory exists and is clean
   if (fs.existsSync(TEMP_PAGES_DIR)) {
     const existing = fs.readdirSync(TEMP_PAGES_DIR);
@@ -28,6 +29,7 @@ export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
   const pdfParse = require('pdf-parse');
   const pdfData = await pdfParse(pdfBuffer);
   const pageCount: number = pdfData.numpages;
+  console.log('[pages] PDF has', pageCount, 'pages — converting each to JPEG');
 
   const converter = fromPath(tempPdfPath, {
     density: 150,
@@ -59,6 +61,7 @@ export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
     fs.unlinkSync(tempPdfPath);
   }
 
+  console.log('[pages] Conversion complete —', imageUrls.length, 'images generated');
   return imageUrls;
 }
 

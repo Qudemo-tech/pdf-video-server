@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { randomUUID } from 'crypto';
 import { extractTextFromPDF } from '../lib/pdf';
+import { uploadBufferToGCS } from '../lib/gcs';
 
 export async function extractTextHandler(req: Request, res: Response) {
   try {
@@ -23,11 +25,23 @@ export async function extractTextHandler(req: Request, res: Response) {
       });
     }
 
+    // Upload PDF to GCS (non-fatal if it fails)
+    let pdfUrl: string | null = null;
+    const sessionId = randomUUID();
+    console.log('[extract-text] Attempting GCS PDF upload for session:', sessionId);
+    try {
+      pdfUrl = await uploadBufferToGCS(buffer, `pdfs/${sessionId}.pdf`, 'application/pdf');
+      console.log('[extract-text] GCS PDF upload result:', pdfUrl);
+    } catch (uploadErr: any) {
+      console.error('[extract-text] GCS PDF upload failed (non-fatal):', uploadErr);
+    }
+
     return res.json({
       success: true,
       text: result.text,
       pageCount: result.pageCount,
       characterCount: result.characterCount,
+      pdfUrl,
     });
   } catch (error) {
     console.error('PDF extraction error:', error);

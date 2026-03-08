@@ -13,7 +13,9 @@ export async function generateVideoHandler(req: Request, res: Response) {
       });
     }
 
+    console.log('[generate-video] Request received — name:', videoName, '| script length:', script.length, '| background:', backgroundUrl || 'none');
     const result = await generateVideo(script, videoName, backgroundUrl);
+    console.log('[generate-video] Video created — videoId:', result.video_id, '| status:', result.status);
 
     return res.json({
       success: true,

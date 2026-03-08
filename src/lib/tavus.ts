@@ -25,6 +25,7 @@ export async function generateVideo(
     payload.background_url = backgroundUrl;
   }
 
+  console.log('[tavus] Sending video generation request — name:', payload.video_name, '| script length:', script.length, '| background:', backgroundUrl || 'none');
   const response = await fetch(`${TAVUS_BASE_URL}/videos`, {
     method: 'POST',
     headers: getHeaders(),
@@ -33,10 +34,13 @@ export async function generateVideo(
 
   if (!response.ok) {
     const errorBody = await response.text();
+    console.error('[tavus] Video generation failed — status:', response.status, '| body:', errorBody);
     throw new Error(`Tavus API error (${response.status}): ${errorBody}`);
   }
 
-  return response.json() as Promise<TavusVideoResponse>;
+  const result = await response.json() as TavusVideoResponse;
+  console.log('[tavus] Video generation accepted — videoId:', result.video_id, '| status:', result.status);
+  return result;
 }
 
 export async function getVideoStatus(videoId: string): Promise<TavusVideoResponse> {
@@ -47,8 +51,11 @@ export async function getVideoStatus(videoId: string): Promise<TavusVideoRespons
 
   if (!response.ok) {
     const errorBody = await response.text();
+    console.error('[tavus] Status check failed — videoId:', videoId, '| status:', response.status);
     throw new Error(`Tavus API error (${response.status}): ${errorBody}`);
   }
 
-  return response.json() as Promise<TavusVideoResponse>;
+  const result = await response.json() as TavusVideoResponse;
+  console.log('[tavus] Status check — videoId:', videoId, '| status:', result.status, result.status === 'ready' ? '| downloadUrl: ' + result.download_url : '');
+  return result;
 }

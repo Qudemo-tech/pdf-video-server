@@ -8,12 +8,14 @@ const OUTPUT_DIR = path.join(process.cwd(), 'public', 'output');
  * Download a video from a URL and save it to a local path.
  */
 async function downloadVideo(url: string, outputPath: string): Promise<void> {
+  console.log('[ffmpeg] Downloading video from:', url);
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to download video from ${url}: ${response.status}`);
   }
   const buffer = Buffer.from(await response.arrayBuffer());
   fs.writeFileSync(outputPath, buffer);
+  console.log('[ffmpeg] Downloaded video — size:', (buffer.length / 1024 / 1024).toFixed(2), 'MB');
 }
 
 /**
@@ -55,12 +57,14 @@ export async function stitchVideos(
 
   try {
     // Download all videos
+    console.log('[ffmpeg] Starting stitch — videos:', videoUrls.length, '| images:', imageUrls?.length || 0);
     const localPaths: string[] = [];
     for (let i = 0; i < videoUrls.length; i++) {
       const localPath = path.join(tempDir, `video-${i}.mp4`);
       await downloadVideo(videoUrls[i], localPath);
       localPaths.push(localPath);
     }
+    console.log('[ffmpeg] All videos downloaded');
 
     // Process each video: PiP composite for page videos, normalize for intro
     const normalizedPaths: string[] = [];
@@ -72,18 +76,24 @@ export async function stitchVideos(
       if (i > 0 && imageUrls && imageUrls[i - 1]) {
         const imagePath = imageUrls[i - 1];
         if (fs.existsSync(imagePath)) {
+          console.log(`[ffmpeg] Compositing video ${i} with page image: ${imagePath}`);
           compositePageVideo(imagePath, localPaths[i], normalizedPath);
           normalizedPaths.push(normalizedPath);
+          console.log(`[ffmpeg] Composite complete for video ${i}`);
           continue;
+        } else {
+          console.log(`[ffmpeg] Page image not found for video ${i}: ${imagePath}`);
         }
       }
 
       // Fallback: just normalize (for intro or if image not found)
+      console.log(`[ffmpeg] Normalizing video ${i} (${i === 0 ? 'intro' : 'fallback'})`);
       execSync(
         `ffmpeg -y -i "${localPaths[i]}" -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -ac 2 -r 30 -vf "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2" "${normalizedPath}"`,
         { stdio: 'pipe', timeout: 300000 }
       );
       normalizedPaths.push(normalizedPath);
+      console.log(`[ffmpeg] Normalized video ${i}`);
     }
 
     // Create concat list file
@@ -95,10 +105,14 @@ export async function stitchVideos(
     const outputFilename = `stitched-${timestamp}.mp4`;
     const outputPath = path.join(OUTPUT_DIR, outputFilename);
 
+    console.log('[ffmpeg] Concatenating', normalizedPaths.length, 'videos into:', outputFilename);
     execSync(
       `ffmpeg -y -f concat -safe 0 -i "${listPath}" -c copy "${outputPath}"`,
       { stdio: 'pipe', timeout: 300000 }
     );
+
+    const outputSize = fs.statSync(outputPath).size;
+    console.log('[ffmpeg] Stitch complete — output:', outputFilename, '| size:', (outputSize / 1024 / 1024).toFixed(2), 'MB');
 
     // Clean up temp directory
     fs.rmSync(tempDir, { recursive: true, force: true });

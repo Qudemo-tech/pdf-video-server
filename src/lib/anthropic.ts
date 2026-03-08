@@ -49,6 +49,7 @@ Target duration: ${maxLengthSeconds} seconds (~${targetWordCount} words)
 DOCUMENT CONTENT:
 ${truncatedText}`;
 
+  console.log('[anthropic] Generating summary script — tone:', tone, '| target duration:', maxLengthSeconds, 's | text length:', truncatedText.length);
   const message = await getClient().messages.create({
     model: 'claude-sonnet-4-5-20250929',
     max_tokens: 2048,
@@ -60,6 +61,7 @@ ${truncatedText}`;
       },
     ],
   });
+  console.log('[anthropic] Summary script received — usage:', message.usage);
 
   const script = message.content
     .filter((block) => block.type === 'text')
@@ -123,12 +125,14 @@ Format your response as JSON array:
 
 Output ONLY valid JSON, nothing else.`;
 
+  console.log('[anthropic] Generating page scripts — pages:', textByPage.length, '| full text length:', fullText.length);
   const message = await getClient().messages.create({
     model: 'claude-sonnet-4-5-20250929',
     max_tokens: 4096,
     system: 'You are a concise video script writer. Output only valid JSON as requested.',
     messages: [{ role: 'user', content: userMessage }],
   });
+  console.log('[anthropic] Page scripts received — usage:', message.usage);
 
   const responseText = message.content
     .filter((block) => block.type === 'text')

@@ -8,7 +8,9 @@ interface PDFExtractResult {
 }
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<PDFExtractResult> {
+  console.log('[pdf] Extracting text from PDF, buffer size:', buffer.length);
   const data = await pdfParse(buffer);
+  console.log('[pdf] Extraction complete — pages:', data.numpages, '| raw text length:', (data.text as string).length);
 
   const text = (data.text as string)
     // Strip control characters except newlines and tabs

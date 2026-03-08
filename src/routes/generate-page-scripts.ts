@@ -19,7 +19,9 @@ export async function generatePageScriptsHandler(req: Request, res: Response) {
       });
     }
 
+    console.log('[generate-page-scripts] Request received — pages:', textByPage.length, '| full text length:', fullText.length);
     const scripts = await generatePageScripts(textByPage, fullText);
+    console.log('[generate-page-scripts] Scripts generated:', scripts.length, 'scripts');
 
     return res.json({
       success: true,
