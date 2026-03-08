@@ -12,6 +12,14 @@ import { generatePageScriptsHandler } from './routes/generate-page-scripts';
 import { generateVideoHandler } from './routes/generate-video';
 import { videoStatusHandler } from './routes/video-status';
 import { stitchVideosHandler } from './routes/stitch-videos';
+import {
+  createSessionHandler,
+  getSessionByIdHandler,
+  getActiveSessionHandler,
+  getSessionHistoryHandler,
+  updateSessionHandler,
+  deleteSessionHandler,
+} from './routes/sessions';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
@@ -58,6 +66,14 @@ app.post('/api/generate-page-scripts', generatePageScriptsHandler);
 app.post('/api/generate-video', generateVideoHandler);
 app.get('/api/video-status', videoStatusHandler);
 app.post('/api/stitch-videos', stitchVideosHandler);
+
+// Session persistence routes (specific paths before :id param)
+app.post('/api/sessions', createSessionHandler);
+app.get('/api/sessions/active', getActiveSessionHandler);
+app.get('/api/sessions/history', getSessionHistoryHandler);
+app.get('/api/sessions/:id', getSessionByIdHandler);
+app.patch('/api/sessions/:id', updateSessionHandler);
+app.delete('/api/sessions/:id', deleteSessionHandler);
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
