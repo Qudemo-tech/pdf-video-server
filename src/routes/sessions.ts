@@ -15,6 +15,7 @@ export async function createSessionHandler(req: Request, res: Response) {
       extracted_text,
       page_count,
       character_count,
+      pbp_data,
     } = req.body;
 
     if (!user_email) {
@@ -32,6 +33,7 @@ export async function createSessionHandler(req: Request, res: Response) {
         character_count: character_count || 0,
         current_step: 'upload',
         status: 'in_progress',
+        pbp_data: pbp_data || null,
       })
       .select()
       .single();

@@ -21,7 +21,7 @@ RULES:
 4. Start with a brief, engaging hook — do NOT start with "Hello" or "Welcome".
 5. Summarize the key points of the document. Do not try to cover every detail.
 6. Use transition phrases naturally: "Now, here's the interesting part...", "What this means is...", "Let's look at..."
-7. End with a clear conclusion or call to action.
+7. End the script with the exact phrase "Thank you for watching." as the last sentence.
 8. Do NOT include any stage directions, speaker labels, timestamps, or formatting.
 9. Output ONLY the script text that will be spoken. Nothing else.
 10. Do NOT use markdown formatting, headers, bullet points, or any special characters.
@@ -115,6 +115,7 @@ RULES:
 - Do NOT use markdown, bullet points, or any formatting.
 - Do NOT include labels like "INTRO:" or "PAGE 1:".
 - Output ONLY the spoken text.
+- The LAST page script must end with the exact phrase "Thank you for watching." as its final sentence.
 
 Format your response as JSON array:
 [
