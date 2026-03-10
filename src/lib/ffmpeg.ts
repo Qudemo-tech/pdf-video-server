@@ -29,7 +29,8 @@ function compositePageVideo(
 ): void {
   execSync(
     `ffmpeg -y -loop 1 -i "${imagePath}" -i "${avatarVideoPath}" ` +
-    `-filter_complex "[0:v]scale=1280:720[bg];[1:v]scale=280:-1[avatar];` +
+    `-filter_complex "[0:v]scale=1280:720:force_original_aspect_ratio=decrease,` +
+    `pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=black[bg];[1:v]scale=280:-1[avatar];` +
     `[bg][avatar]overlay=W-w-20:H-h-20:shortest=1[out]" ` +
     `-map "[out]" -map 1:a -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -r 30 -shortest "${outputPath}"`,
     { stdio: 'pipe', timeout: 300000 }

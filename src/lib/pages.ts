@@ -1,4 +1,5 @@
 import { fromPath } from 'pdf2pic';
+import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
@@ -37,7 +38,7 @@ export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
     savePath: TEMP_PAGES_DIR,
     format: 'jpg',
     width: 1920,
-    height: 1080,
+    preserveAspectRatio: true,
   });
 
   const imageUrls: string[] = [];
@@ -52,6 +53,17 @@ export async function convertPDFToImages(pdfBuffer: Buffer): Promise<string[]> {
       if (result.path !== newPath) {
         fs.renameSync(result.path, newPath);
       }
+      // Log actual image dimensions for debugging
+      try {
+        const dims = execSync(
+          `identify -format "%wx%h" "${newPath}"`,
+          { encoding: 'utf-8', timeout: 5000 }
+        ).trim();
+        console.log(`[pages] Page ${i} image dimensions: ${dims}`);
+      } catch {
+        console.log(`[pages] Page ${i} — could not read dimensions`);
+      }
+
       imageUrls.push(`/temp-pages/${newName}`);
     }
   }
