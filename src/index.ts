@@ -20,6 +20,7 @@ import {
   updateSessionHandler,
   deleteSessionHandler,
 } from './routes/sessions';
+import { sendNotificationHandler } from './routes/send-notification';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
@@ -74,6 +75,9 @@ app.get('/api/sessions/history', getSessionHistoryHandler);
 app.get('/api/sessions/:id', getSessionByIdHandler);
 app.patch('/api/sessions/:id', updateSessionHandler);
 app.delete('/api/sessions/:id', deleteSessionHandler);
+
+// Notification route
+app.post('/api/send-notification', sendNotificationHandler);
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {

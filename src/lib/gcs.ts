@@ -49,3 +49,29 @@ export function getPublicUrl(destination: string): string {
   const bucketName = process.env.GCS_BUCKET_NAME || 'pdftovideo';
   return `https://storage.googleapis.com/${bucketName}/${destination}`;
 }
+
+/**
+ * Generate a signed URL for a GCS object given its public URL.
+ * The signed URL grants temporary read access without requiring bucket-level public permissions.
+ */
+export async function generateSignedUrl(publicUrl: string, expiresInDays = 7): Promise<string> {
+  const bucketName = process.env.GCS_BUCKET_NAME || 'pdftovideo';
+  const prefix = `https://storage.googleapis.com/${bucketName}/`;
+
+  if (!publicUrl.startsWith(prefix)) {
+    console.warn('[GCS] URL does not match expected bucket prefix, returning as-is:', publicUrl);
+    return publicUrl;
+  }
+
+  const objectPath = publicUrl.slice(prefix.length);
+  const file = getBucket().file(objectPath);
+
+  const [signedUrl] = await file.getSignedUrl({
+    version: 'v4',
+    action: 'read',
+    expires: Date.now() + expiresInDays * 24 * 60 * 60 * 1000,
+  });
+
+  console.log('[GCS] Generated signed URL for:', objectPath, '| expires in', expiresInDays, 'days');
+  return signedUrl;
+}
