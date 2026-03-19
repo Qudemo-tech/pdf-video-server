@@ -21,6 +21,8 @@ import {
   deleteSessionHandler,
 } from './routes/sessions';
 import { sendNotificationHandler } from './routes/send-notification';
+import { getCreditsHandler, checkCreditsHandler, deductCreditsHandler } from './routes/credits';
+import { createCheckoutHandler, stripeWebhookHandler } from './routes/stripe';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
@@ -43,6 +45,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Stripe webhook (must be before express.json() for raw body signature verification)
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 // Body parsing
 app.use(express.json({ limit: '50mb' }));
@@ -75,6 +80,12 @@ app.get('/api/sessions/history', getSessionHistoryHandler);
 app.get('/api/sessions/:id', getSessionByIdHandler);
 app.patch('/api/sessions/:id', updateSessionHandler);
 app.delete('/api/sessions/:id', deleteSessionHandler);
+
+// Credit routes
+app.get('/api/credits', getCreditsHandler);
+app.get('/api/credits/check', checkCreditsHandler);
+app.post('/api/credits/deduct', deductCreditsHandler);
+app.post('/api/stripe/checkout', createCheckoutHandler);
 
 // Notification route
 app.post('/api/send-notification', sendNotificationHandler);
