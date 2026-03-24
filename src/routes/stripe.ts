@@ -52,7 +52,7 @@ export async function createCheckoutHandler(req: Request, res: Response) {
         plan,
       },
       customer_email: user_email,
-      success_url: `${frontendUrl}?payment=success`,
+      success_url: `${frontendUrl}?payment=success#upload`,
       cancel_url: `${frontendUrl}/#pricing`,
     });
 
