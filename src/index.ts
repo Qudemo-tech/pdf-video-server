@@ -21,7 +21,7 @@ import {
   deleteSessionHandler,
 } from './routes/sessions';
 import { sendNotificationHandler } from './routes/send-notification';
-import { getCreditsHandler, checkCreditsHandler, deductCreditsHandler } from './routes/credits';
+import { getCreditsHandler, checkCreditsHandler, deductCreditsHandler, hasPurchasedHandler } from './routes/credits';
 import { createCheckoutHandler, stripeWebhookHandler } from './routes/stripe';
 
 const app = express();
@@ -84,6 +84,7 @@ app.delete('/api/sessions/:id', deleteSessionHandler);
 // Credit routes
 app.get('/api/credits', getCreditsHandler);
 app.get('/api/credits/check', checkCreditsHandler);
+app.get('/api/credits/has-purchased', hasPurchasedHandler);
 app.post('/api/credits/deduct', deductCreditsHandler);
 app.post('/api/stripe/checkout', createCheckoutHandler);
 

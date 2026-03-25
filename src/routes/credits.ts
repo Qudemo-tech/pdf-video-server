@@ -121,3 +121,34 @@ export async function deductCreditsHandler(req: Request, res: Response) {
     return res.status(500).json({ success: false, error: 'Failed to deduct credits' });
   }
 }
+
+/**
+ * GET /api/credits/has-purchased?email=...
+ * Check if a user has ever purchased credits.
+ */
+export async function hasPurchasedHandler(req: Request, res: Response) {
+  try {
+    const email = req.query.email as string;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'email query param is required' });
+    }
+
+    const { data, error } = await getSupabase()
+      .from('credit_transactions')
+      .select('id')
+      .eq('user_email', email)
+      .eq('type', 'purchase')
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[credits] Has-purchased error:', error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+
+    return res.json({ success: true, hasPurchased: !!data });
+  } catch (err) {
+    console.error('[credits] Has-purchased exception:', err);
+    return res.status(500).json({ success: false, error: 'Failed to check purchase history' });
+  }
+}
