@@ -106,11 +106,14 @@ PAGE CONTENTS:
 ${pageDescriptions}
 
 Generate scripts as follows:
-1. INTRO script (~25 words): A brief overview of what this document covers. This plays full-screen with just the avatar. Start with something engaging.
-2. One script PER PAGE (~25 words each): A short explanation of what that specific page contains. These play with the page image as background.
+1. INTRO script (~25-30 words): A brief overview of what this document covers. This plays full-screen with just the avatar. Start with something engaging.
+2. One script PER PAGE: An explanation of what that specific page contains. These play with the page image as background. Adapt the length to the content:
+   - Title or sparse pages: ~20-30 words
+   - Standard content pages: ~40-60 words
+   - Dense or complex pages: ~60-80 words
 
 RULES:
-- Each script must be EXACTLY around 20-30 words. Be concise.
+- Adapt script length to the density and complexity of each page's content. Sparse pages (title slides, section dividers) should be brief. Content-heavy pages deserve fuller explanations.
 - Write in first person, speaking directly to the viewer.
 - Do NOT use markdown, bullet points, or any formatting.
 - Do NOT include labels like "INTRO:" or "PAGE 1:".
